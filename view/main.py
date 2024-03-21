@@ -1,9 +1,8 @@
 import dearpygui.dearpygui as dpg
-from ssh_processing.connect import SSHProcessing
+from service.SSHProcessing import SSHProcessing
 
 WIDTH = 1000
 HEIGHT = 600
-
 
 ssh_manager = SSHProcessing()
 
@@ -17,7 +16,22 @@ with dpg.font_registry():
     default_font = dpg.add_font("../font/JetBrainsMono-Medium.ttf", 24)
 
 
-def connect_ssh(manager):
+def transfer(manager: SSHProcessing):
+    manager.transfer_files()
+
+
+def close():
+    global ssh_manager
+    ssh_manager.close()
+    dpg.hide_item('Monitoring')
+    dpg.hide_item('Console')
+    dpg.hide_item('Transfer')
+    dpg.hide_item('Exit')
+    dpg.set_value(1, '')
+    dpg.set_value("text_widget", f'Connect to VM: False')
+
+
+def connect_ssh(manager: SSHProcessing):
     host = dpg.get_value(1)
     port = dpg.get_value(2)
     username = dpg.get_value(3)
@@ -26,10 +40,10 @@ def connect_ssh(manager):
     connected = manager.connect(host, port, username, password)
     if connected:
         dpg.set_value("text_widget", f'Connect to VM: True')
-        dpg.configure_item("Monitoring", enabled=True)
-        dpg.configure_item("Console", enabled=True)
         dpg.show_item('Monitoring')
         dpg.show_item('Console')
+        dpg.show_item('Transfer')
+        dpg.show_item('Exit')
     else:
         dpg.set_value("text_widget", f'Connect to VM: False')
 
@@ -45,6 +59,7 @@ def print_command_result():
 
 def open_monitoring_window():
     dpg.configure_item(monitoring_window, show=True)
+    dpg.configure_item(transfer_window, show=False)
     dpg.configure_item(main_window, show=False)
     dpg.configure_item(console_window, show=False)
     dpg.set_primary_window(monitoring_window, True)
@@ -52,12 +67,22 @@ def open_monitoring_window():
 
 def open_main_window():
     dpg.configure_item(monitoring_window, show=False)
+    dpg.configure_item(transfer_window, show=False)
     dpg.configure_item(main_window, show=True)
     dpg.configure_item(console_window, show=False)
     dpg.set_primary_window(main_window, True)
 
 
+def open_transfer_window():
+    dpg.configure_item(monitoring_window, show=False)
+    dpg.configure_item(main_window, show=False)
+    dpg.configure_item(console_window, show=False)
+    dpg.configure_item(transfer_window, show=True)
+    dpg.set_primary_window(transfer_window, True)
+
+
 def open_console_window():
+    dpg.configure_item(transfer_window, show=False)
     dpg.configure_item(monitoring_window, show=False)
     dpg.configure_item(main_window, show=False)
     dpg.configure_item(console_window, show=True)
@@ -67,6 +92,16 @@ def open_console_window():
 with dpg.window(show=False) as monitoring_window:
     dpg.bind_font(default_font)
     dpg.add_button(label="Back", callback=open_main_window)
+
+
+with dpg.window(show=False) as transfer_window:
+    dpg.bind_font(default_font)
+    dpg.add_button(label="Back", callback=open_main_window)
+    dpg.add_spacer(height=10)
+    dpg.add_input_text(default_value='/home/egor/python-app/test.py', hint='From', tag='from')
+    dpg.add_input_text(default_value='/root', hint='To', tag='to')
+    dpg.add_spacer(height=30)
+    dpg.add_button(label='Transfer', callback=lambda: ssh_manager.transfer_files(dpg.get_value('from'), dpg.get_value(3), dpg.get_value(1), dpg.get_value('to')))
 
 
 with dpg.window(show=False) as console_window:
@@ -86,19 +121,20 @@ with dpg.window() as main_window:
     dpg.bind_font(default_font)
     text_widget = dpg.add_text(f'Connect to VM:', tag="text_widget")
     dpg.add_spacer(height=10)
-    dpg.add_input_text(hint='host', tag=1)
+    dpg.add_input_text(default_value='192.168.40.16', hint='host', tag=1)
     dpg.add_input_int(default_value=22, tag=2)
-    dpg.add_input_text(hint='username', tag=3)
+    dpg.add_input_text(default_value='root', hint='username', tag=3)
     dpg.add_input_text(hint='password', tag=4)
     dpg.add_spacer(height=10)
-    dpg.add_button(label="Connect", callback=lambda: connect_ssh(ssh_manager))
+    with dpg.group(horizontal=True):
+        dpg.add_button(label="Connect", callback=lambda: connect_ssh(ssh_manager))
+        dpg.add_button(label="Exit", tag='Exit', callback=close, show=False)
     dpg.add_spacer(height=30)
 
     with dpg.group(horizontal=True):
-        monitoring_button = dpg.add_button(label="Monitoring", tag='Monitoring', callback=open_monitoring_window,
-                                           enabled=False, show=False)
-        console_button = dpg.add_button(label="Console", tag='Console', callback=open_console_window, enabled=False,
-                                        show=False)
+        monitoring_button = dpg.add_button(label="Monitoring", tag='Monitoring', callback=open_monitoring_window, show=False)
+        console_button = dpg.add_button(label="Console", tag='Console', callback=open_console_window, show=False)
+        transfer_button = dpg.add_button(label="Transfer file", tag='Transfer', callback=open_transfer_window, show=False)
 
 dpg.set_primary_window(main_window, True)
 dpg.show_viewport()

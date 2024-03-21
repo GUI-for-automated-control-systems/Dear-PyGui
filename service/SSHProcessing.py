@@ -14,6 +14,9 @@ class SSHProcessing:
             print("Connection error:", str(e))
             return False
 
+    def close(self):
+        self.ssh.close()
+
     def execute_command(self, command):
         try:
             stdin, stdout, stderr = self.ssh.exec_command(command)
@@ -22,7 +25,14 @@ class SSHProcessing:
             print("Command execution error:", str(e))
             return None
 
+    def transfer_files(self, path_from, path_to, host):
+        who_am_i = '/root'
+        command = f'scp {path_from} {who_am_i}@{host}:{path_to}'
+        print(command)
+        self.execute_command(command)
+
 # host = '192.168.40.16'
 # port = 22
 # username = 'root'
 # password = ''
+# scp /home/egor/python-app/test.py root@192.168.40.16:/root
