@@ -1,28 +1,26 @@
 import paramiko
 
 
-def init_session():
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    return ssh
+class SSHProcessing:
+    def __init__(self):
+        self.ssh = paramiko.SSHClient()
+        self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
+    def connect(self, host, port, username, password):
+        try:
+            self.ssh.connect(hostname=host, port=port, username=username, password=password)
+            return True
+        except Exception as e:
+            print("Connection error:", str(e))
+            return False
 
-def ssh_connect(hostname: str, port: int, username: str, password: str, ssh: paramiko.SSHClient):
-    try:
-        ssh.connect(hostname, port, username, password)
-        print("Успешное подключение по SSH")
-        return True
-    except Exception as e:
-        print(f"Ошибка подключения: {e}")
-        return False
-    finally:
-        ssh.close()
-
-
-def execute_command(command: str, ssh: paramiko.SSHClient):
-    stdin, stdout, stderr = ssh.exec_command(command)
-    data = stdout.read() + stderr.read()
-    return data.decode('utf-8')
+    def execute_command(self, command):
+        try:
+            stdin, stdout, stderr = self.ssh.exec_command(command)
+            return stdout.read().decode('utf-8')
+        except Exception as e:
+            print("Command execution error:", str(e))
+            return None
 
 # host = '192.168.40.16'
 # port = 22
