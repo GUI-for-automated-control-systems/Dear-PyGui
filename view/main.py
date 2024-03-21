@@ -12,18 +12,9 @@ dpg.create_context()
 dpg.create_viewport(title='VMmanager', width=WIDTH, height=HEIGHT)
 dpg.setup_dearpygui()
 
-def open_monitoring_window():
-    dpg.configure_item(monitoring_window, show=True)
-    dpg.configure_item(main_window, show=False)
-    dpg.configure_item(console_window, show=False)
-    dpg.set_primary_window(monitoring_window, True)
 
-
-def open_console_window():
-    dpg.configure_item(monitoring_window, show=False)
-    dpg.configure_item(main_window, show=False)
-    dpg.configure_item(console_window, show=True)
-    dpg.set_primary_window(console_window, True)
+with dpg.font_registry():
+    default_font = dpg.add_font("../font/JetBrainsMono-Medium.ttf", 24)
 
 
 def connect_ssh(manager):
@@ -43,14 +34,11 @@ def connect_ssh(manager):
         dpg.set_value("text_widget", f'Connect to VM: False')
 
 
-with dpg.font_registry():
-    default_font = dpg.add_font("../font/JetBrainsMono-Medium.ttf", 24)
-
 def print_command_result():
     command = dpg.get_value('command')
     result = ssh_manager.execute_command(command)
     if result is not None:
-        print(result)
+        dpg.set_value('command_res', result)
     else:
         print("Command execution failed.")
 
@@ -84,9 +72,14 @@ with dpg.window(show=False) as monitoring_window:
 with dpg.window(show=False) as console_window:
     dpg.bind_font(default_font)
     dpg.add_button(label="Back", callback=open_main_window)
+    dpg.add_spacer(height=10)
     dpg.add_text('Command line mod')
     dpg.add_input_text(hint='command', tag='command')
-    dpg.add_button(label='execute', callback=print_command_result)
+    dpg.add_spacer(height=10)
+    dpg.add_button(label='Execute', callback=print_command_result)
+    dpg.add_spacer(height=30)
+    dpg.add_text('Result:')
+    dpg.add_text('', tag='command_res')
 
 
 with dpg.window() as main_window:
