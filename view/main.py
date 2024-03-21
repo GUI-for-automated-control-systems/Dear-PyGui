@@ -1,24 +1,27 @@
 import dearpygui.dearpygui as dpg
+import paramiko
 from ssh_processing.connect import ssh_connect, execute_command, init_session
 
 WIDTH = 1000
 HEIGHT = 600
+ssh = paramiko.SSHClient()
+ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
 
 dpg.create_context()
 dpg.create_viewport(title='VMmanager', width=WIDTH, height=HEIGHT)
 dpg.setup_dearpygui()
 
 
-ssh = init_session()
-
-
 def print_command_result():
+    global ssh
     print(execute_command(dpg.get_value('command'), ssh))
 
 
 def connect():
-    session = ssh_connect(dpg.get_value(1), dpg.get_value(2), dpg.get_value(3), dpg.get_value(4), ssh)
-    if session:
+    global ssh
+    ssh = ssh_connect(dpg.get_value(1), dpg.get_value(2), dpg.get_value(3), dpg.get_value(4), ssh)
+    if ssh:
         dpg.set_value("text_widget", f'Connect to VM: True')
         dpg.configure_item("Monitoring", enabled=True)
         dpg.configure_item("Console", enabled=True)
@@ -29,7 +32,7 @@ def connect():
 
 
 with dpg.font_registry():
-    default_font = dpg.add_font("../font/Monocraft.ttf", 24)
+    default_font = dpg.add_font("../font/JetBrainsMono-Medium.ttf", 24)
 
 
 def open_monitoring_window():
@@ -53,7 +56,6 @@ def open_console_window():
     dpg.set_primary_window(console_window, True)
 
 
-
 with dpg.window() as main_window:
     text_widget = dpg.add_text(f'Connect to VM:', tag="text_widget")
     dpg.add_spacer(height=10)
@@ -66,8 +68,9 @@ with dpg.window() as main_window:
     dpg.bind_font(default_font)
     dpg.add_spacer(height=30)
 
-    monitoring_button = dpg.add_button(label="Monitoring", tag='Monitoring', callback=open_monitoring_window, enabled=False, show=False)
-    console_button = dpg.add_button(label="Console", tag='Console', callback=open_console_window, enabled=False, show=False)
+    with dpg.group(horizontal=True):
+        monitoring_button = dpg.add_button(label="Monitoring", tag='Monitoring', callback=open_monitoring_window, enabled=False, show=False)
+        console_button = dpg.add_button(label="Console", tag='Console', callback=open_console_window, enabled=False, show=False)
 
 
 with dpg.window(show=False) as monitoring_window:
