@@ -17,7 +17,7 @@ with dpg.font_registry():
 
 
 def transfer(manager: SSHProcessing):
-    manager.transfer_files()
+    print(manager.transfer_files(dpg.get_value('from'), dpg.get_value('to'), dpg.get_value(1)))
 
 
 def close():
@@ -101,7 +101,7 @@ with dpg.window(show=False) as transfer_window:
     dpg.add_input_text(default_value='/home/egor/python-app/test.py', hint='From', tag='from')
     dpg.add_input_text(default_value='/root', hint='To', tag='to')
     dpg.add_spacer(height=30)
-    dpg.add_button(label='Transfer', callback=lambda: ssh_manager.transfer_files(dpg.get_value('from'), dpg.get_value(3), dpg.get_value(1), dpg.get_value('to')))
+    dpg.add_button(label='Transfer', callback=lambda :transfer(ssh_manager))
 
 
 with dpg.window(show=False) as console_window:

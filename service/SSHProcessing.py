@@ -25,11 +25,12 @@ class SSHProcessing:
             print("Command execution error:", str(e))
             return None
 
-    def transfer_files(self, path_from, path_to, host):
-        who_am_i = '/root'
-        command = f'scp {path_from} {who_am_i}@{host}:{path_to}'
-        print(command)
-        self.execute_command(command)
+    # def transfer_files(self, path_from, path_to, host):
+    #     return f'scp {path_from} egor@{host}:{path_to}'
+
+    def get_vm_info(self):
+        distributive_info = self.execute_command('lsb_release -a')
+
 
 # host = '192.168.40.16'
 # port = 22
