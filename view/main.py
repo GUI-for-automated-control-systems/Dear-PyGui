@@ -27,6 +27,7 @@ def close():
     dpg.hide_item('Console')
     dpg.hide_item('Transfer')
     dpg.hide_item('Exit')
+    dpg.hide_item('info')
     dpg.set_value(1, '')
     dpg.set_value("text_widget", f'Connect to VM: False')
 
@@ -39,11 +40,18 @@ def connect_ssh(manager: SSHProcessing):
 
     connected = manager.connect(host, port, username, password)
     if connected:
-        dpg.set_value("text_widget", f'Connect to VM: True')
+        dpg.set_value("text_widget", f'Connect to VM: True')   # <------------------------[
         dpg.show_item('Monitoring')
         dpg.show_item('Console')
         dpg.show_item('Transfer')
         dpg.show_item('Exit')
+        dist, mem, cpu, uptime = manager.get_vm_info()
+        dpg.set_value('distributive', dist)
+        dpg.set_value('memory', mem)
+        dpg.set_value('cpu', cpu)
+        dpg.set_value('uptime', uptime)
+        dpg.show_item('info')
+
     else:
         dpg.set_value("text_widget", f'Connect to VM: False')
 
@@ -135,6 +143,24 @@ with dpg.window() as main_window:
         monitoring_button = dpg.add_button(label="Monitoring", tag='Monitoring', callback=open_monitoring_window, show=False)
         console_button = dpg.add_button(label="Console", tag='Console', callback=open_console_window, show=False)
         transfer_button = dpg.add_button(label="Transfer file", tag='Transfer', callback=open_transfer_window, show=False)
+
+    with dpg.group(horizontal=False, tag='info', show=False):
+        dpg.add_separator()
+        dpg.add_text('Distributive')
+        dpg.add_separator()
+        dpg.add_text('', tag='distributive')
+        dpg.add_separator()
+        dpg.add_text('Memory')
+        dpg.add_separator()
+        dpg.add_text('', tag='memory')
+        dpg.add_separator()
+        dpg.add_text('CPU')
+        dpg.add_separator()
+        dpg.add_text('', tag='cpu')
+        dpg.add_separator()
+        dpg.add_text('Uptime')
+        dpg.add_separator()
+        dpg.add_text('', tag='uptime')
 
 dpg.set_primary_window(main_window, True)
 dpg.show_viewport()

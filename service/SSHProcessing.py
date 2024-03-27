@@ -25,11 +25,14 @@ class SSHProcessing:
             print("Command execution error:", str(e))
             return None
 
-    # def transfer_files(self, path_from, path_to, host):
-    #     return f'scp {path_from} egor@{host}:{path_to}'
-
     def get_vm_info(self):
         distributive_info = self.execute_command('lsb_release -a')
+        memory_info = self.execute_command('df -h')
+        cpu_info = self.execute_command('lscpu -e')
+        uptime_info = self.execute_command('uptime')
+        return distributive_info, memory_info, cpu_info, uptime_info
+
+
 
 
 # host = '192.168.40.16'
