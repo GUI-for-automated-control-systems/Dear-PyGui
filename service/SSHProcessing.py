@@ -32,6 +32,16 @@ class SSHProcessing:
         uptime_info = self.execute_command('uptime')
         return distributive_info, memory_info, cpu_info, uptime_info
 
+    def send_file_to_server(self, local_file_path, remote_file_path):
+        try:
+            with open(local_file_path, 'rb') as local_file:
+                ftp_client = self.ssh.open_sftp()
+                ftp_client.putfo(local_file, remote_file_path)
+                ftp_client.close()
+            print("Файл успешно передан на сервер.")
+        except Exception as e:
+            print(f"Ошибка: {e}")
+
 
 
 

@@ -1,3 +1,5 @@
+import os
+
 import dearpygui.dearpygui as dpg
 from service.SSHProcessing import SSHProcessing
 
@@ -16,16 +18,22 @@ with dpg.font_registry():
     default_font = dpg.add_font("../font/JetBrainsMono-Medium.ttf", 24)
 
 
-def transfer(manager: SSHProcessing):
-    print(manager.transfer_files(dpg.get_value('from'), dpg.get_value('to'), dpg.get_value(1)))
+def transfer():
+    path_from = dpg.get_value('from')
+    path_to = dpg.get_value('to')
+    file_name = os.path.basename(path_from)
+
+    if not path_to.endswith("/"):
+        path_to += "/"
+
+    path_to += file_name
+    ssh_manager.send_file_to_server(path_from, path_to)
 
 
 def close():
     global ssh_manager
     ssh_manager.close()
-    dpg.hide_item('Monitoring')
-    dpg.hide_item('Console')
-    dpg.hide_item('Transfer')
+    dpg.hide_item('monitoring')
     dpg.hide_item('Exit')
     dpg.hide_item('info')
     dpg.set_value(1, '')
@@ -41,9 +49,7 @@ def connect_ssh(manager: SSHProcessing):
     connected = manager.connect(host, port, username, password)
     if connected:
         dpg.set_value("text_widget", f'Connect to VM: True')   # <------------------------[
-        dpg.show_item('Monitoring')
-        dpg.show_item('Console')
-        dpg.show_item('Transfer')
+        dpg.show_item('monitoring')
         dpg.show_item('Exit')
         dist, mem, cpu, uptime = manager.get_vm_info()
         dpg.set_value('distributive', dist)
@@ -109,7 +115,7 @@ with dpg.window(show=False) as transfer_window:
     dpg.add_input_text(default_value='/home/egor/python-app/test.py', hint='From', tag='from')
     dpg.add_input_text(default_value='/root', hint='To', tag='to')
     dpg.add_spacer(height=30)
-    dpg.add_button(label='Transfer', callback=lambda :transfer(ssh_manager))
+    dpg.add_button(label='Transfer', callback=transfer)
 
 
 with dpg.window(show=False) as console_window:
@@ -134,15 +140,16 @@ with dpg.window() as main_window:
     dpg.add_input_text(default_value='root', hint='username', tag=3)
     dpg.add_input_text(hint='password', tag=4)
     dpg.add_spacer(height=10)
+
     with dpg.group(horizontal=True):
         dpg.add_button(label="Connect", callback=lambda: connect_ssh(ssh_manager))
         dpg.add_button(label="Exit", tag='Exit', callback=close, show=False)
     dpg.add_spacer(height=30)
 
-    with dpg.group(horizontal=True):
-        monitoring_button = dpg.add_button(label="Monitoring", tag='Monitoring', callback=open_monitoring_window, show=False)
-        console_button = dpg.add_button(label="Console", tag='Console', callback=open_console_window, show=False)
-        transfer_button = dpg.add_button(label="Transfer file", tag='Transfer', callback=open_transfer_window, show=False)
+    with dpg.group(horizontal=True, tag='monitoring', show=False):
+        monitoring_button = dpg.add_button(label="Monitoring", callback=open_monitoring_window)
+        console_button = dpg.add_button(label="Console", callback=open_console_window)
+        transfer_button = dpg.add_button(label="Transfer file", callback=open_transfer_window)
 
     with dpg.group(horizontal=False, tag='info', show=False):
         dpg.add_separator()
