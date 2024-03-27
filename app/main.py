@@ -4,10 +4,10 @@ from callbacks.switch_window.switch_window import (open_main_window,
                                                    open_console_window,
                                                    open_monitoring_window,
                                                    open_transfer_window)
-from ssh_processing.SshClient import SSHProcessing
+from ssh_processing.SSHProcessing import SSHProcessing
 
 from callbacks.processing.main_window import close, connect_ssh
-from callbacks.processing.transfer_window import transfer
+from callbacks.processing.transfer_window import transfer, open_file_dialog, set_selected_file
 from callbacks.processing.console_window import print_command_result
 
 WIDTH = 1000
@@ -32,7 +32,6 @@ with dpg.window(show=False) as monitoring_window:
                                                                    transfer_window,
                                                                    console_window))
 
-
 with dpg.window(show=False) as transfer_window:
     dpg.bind_font(default_font)
 
@@ -42,10 +41,20 @@ with dpg.window(show=False) as transfer_window:
                                                                    console_window))
 
     dpg.add_spacer(height=10)
-    dpg.add_input_text(default_value='/home/egor/python-app/test.py', hint='From', tag='from')
-    dpg.add_input_text(default_value='/root', hint='To', tag='to')
+    dpg.add_button(label="Browse", callback=open_file_dialog)
+    dpg.add_input_text(default_value='', hint='From', tag='from', readonly=True)
+    dpg.add_input_text(default_value='', hint='To', tag='to')
     dpg.add_spacer(height=30)
     dpg.add_button(label='Transfer', callback=lambda: transfer(ssh))
+
+
+with dpg.file_dialog(directory_selector=False, show=False, callback=set_selected_file, id="file_dialog_id", width=700,
+                     height=400):
+    dpg.add_file_extension(".*")
+    dpg.add_file_extension("", color=(150, 255, 150, 255))
+    dpg.add_file_extension("Source files (*.cpp *.h *.hpp){.cpp,.h,.hpp}", color=(0, 255, 255, 255))
+    dpg.add_file_extension(".h", color=(255, 0, 255, 255))
+    dpg.add_file_extension(".py", color=(0, 255, 0, 255))
 
 
 with dpg.window(show=False) as console_window:
