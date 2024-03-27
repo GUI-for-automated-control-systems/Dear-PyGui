@@ -1,28 +1,28 @@
-import paramiko
+import dearpygui.dearpygui as dpg
+
+dpg.create_context()
 
 
-def send_file_to_server(local_file_path, remote_file_path, server_address, username, password):
-    try:
-        ssh_client = paramiko.SSHClient()
-        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh_client.connect(hostname=server_address, username=username, password=password)
-
-        scp = ssh_client.open_sftp()
-
-        scp.put(local_file_path, remote_file_path)
-
-        scp.close()
-        ssh_client.close()
-        print("Файл успешно передан на сервер.")
-    except Exception as e:
-        print(f"Ошибка: {e}")
+def callback(sender, app_data, user_data):
+    selected_file_path = list(app_data['selections'].values())[0]
+    print(selected_file_path)
 
 
-if __name__ == "__main__":
-    local_file_path = "/home/egor/python-app/test.py"  # Путь к вашему локальному файлу
-    remote_file_path = "/root/file/test.py"  # Путь куда вы хотите сохранить файл на удаленном сервере
-    server_address = "192.168.40.17"
-    username = "root"
-    password = ""
 
-    send_file_to_server(local_file_path, remote_file_path, server_address, username, password)
+
+with dpg.file_dialog(directory_selector=False, show=False, callback=callback, id="file_dialog_id", width=700 ,height=400):
+    dpg.add_file_extension(".*")
+    dpg.add_file_extension("", color=(150, 255, 150, 255))
+    dpg.add_file_extension("Source files (*.cpp *.h *.hpp){.cpp,.h,.hpp}", color=(0, 255, 255, 255))
+    dpg.add_file_extension(".h", color=(255, 0, 255, 255), custom_text="[header]")
+    dpg.add_file_extension(".py", color=(0, 255, 0, 255), custom_text="[Python]")
+
+
+with dpg.window(label="Tutorial", width=800, height=300):
+    dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog_id"))
+
+dpg.create_viewport(title='Custom Title', width=800, height=600)
+dpg.setup_dearpygui()
+dpg.show_viewport()
+dpg.start_dearpygui()
+dpg.destroy_context()
