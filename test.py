@@ -3,19 +3,17 @@ import dearpygui.dearpygui as dpg
 dpg.create_context()
 
 
-def callback(sender, app_data, user_data):
+def callback(_, app_data):
     selected_file_path = list(app_data['selections'].values())[0]
     print(selected_file_path)
-
-
 
 
 with dpg.file_dialog(directory_selector=False, show=False, callback=callback, id="file_dialog_id", width=700 ,height=400):
     dpg.add_file_extension(".*")
     dpg.add_file_extension("", color=(150, 255, 150, 255))
     dpg.add_file_extension("Source files (*.cpp *.h *.hpp){.cpp,.h,.hpp}", color=(0, 255, 255, 255))
-    dpg.add_file_extension(".h", color=(255, 0, 255, 255), custom_text="[header]")
-    dpg.add_file_extension(".py", color=(0, 255, 0, 255), custom_text="[Python]")
+    dpg.add_file_extension(".h", color=(255, 0, 255, 255))
+    dpg.add_file_extension(".py", color=(0, 255, 0, 255))
 
 
 with dpg.window(label="Tutorial", width=800, height=300):

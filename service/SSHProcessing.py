@@ -42,11 +42,3 @@ class SSHProcessing:
         except Exception as e:
             print(f"Ошибка: {e}")
 
-
-
-
-# host = '192.168.40.16'
-# port = 22
-# username = 'root'
-# password = ''
-# scp /home/egor/python-app/test.py root@192.168.40.16:/root
