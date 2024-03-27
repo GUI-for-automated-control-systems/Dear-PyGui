@@ -1,26 +1,39 @@
-import dearpygui.dearpygui as dpg
-
-dpg.create_context()
-
-
-def callback(_, app_data):
-    selected_file_path = list(app_data['selections'].values())[0]
-    print(selected_file_path)
+import time
+import paramiko
+import socket
 
 
-with dpg.file_dialog(directory_selector=False, show=False, callback=callback, id="file_dialog_id", width=700 ,height=400):
-    dpg.add_file_extension(".*")
-    dpg.add_file_extension("", color=(150, 255, 150, 255))
-    dpg.add_file_extension("Source files (*.cpp *.h *.hpp){.cpp,.h,.hpp}", color=(0, 255, 255, 255))
-    dpg.add_file_extension(".h", color=(255, 0, 255, 255))
-    dpg.add_file_extension(".py", color=(0, 255, 0, 255))
+def get_top_output(server_address, username, password):
+    try:
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(server_address, port=22, username=username, password=password)
+
+        stdin, stdout, stderr = ssh.exec_command("top -b -n1")
+        top_output = stdout.readlines()
+        ssh.close()
+        return top_output
+    except socket.error as e:
+        print("Socket error:", e)
+        return None
+    except paramiko.AuthenticationException:
+        print("Authentication failed. Please check your credentials.")
+        return None
+    except paramiko.SSHException as e:
+        print("SSH connection failed:", e)
+        return None
 
 
-with dpg.window(label="Tutorial", width=800, height=300):
-    dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog_id"))
+address = "192.168.40.17"
+user = "root"
+pwd = ""
 
-dpg.create_viewport(title='Custom Title', width=800, height=600)
-dpg.setup_dearpygui()
-dpg.show_viewport()
-dpg.start_dearpygui()
-dpg.destroy_context()
+while True:
+    output = get_top_output(address, user, pwd)
+    if output:
+        for line in output:
+            print(line.strip())
+    else:
+        print("Failed to get top output. Retrying...")
+    time.sleep(0.5)
+
