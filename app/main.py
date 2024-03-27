@@ -27,6 +27,8 @@ with dpg.font_registry():
 
 with dpg.window(show=False) as monitoring_window:
     dpg.bind_font(default_font)
+    dpg.add_text(label='Top')
+    dpg.add_text(tag='top')
     dpg.add_button(label="Back", callback=lambda: open_main_window(main_window,
                                                                    monitoring_window,
                                                                    transfer_window,

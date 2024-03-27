@@ -42,3 +42,12 @@ class SSHProcessing:
         except Exception as e:
             print(f"Ошибка: {e}")
 
+    def get_top_output(self):
+        try:
+            stdin, stdout, stderr = self.ssh.exec_command("top -b -n1")
+            top_output = stdout.readlines()
+            return top_output
+        except Exception as e:
+            print("Error getting top output:", str(e))
+            return None
+
