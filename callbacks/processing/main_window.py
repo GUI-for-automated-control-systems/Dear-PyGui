@@ -29,13 +29,5 @@ def connect_ssh(ssh_client):
         dpg.set_value('uptime', uptime)
         dpg.show_item('info')
 
-        while True:
-            output = ssh_client.get_top_output()
-            if output:
-                for line in output[7:28]:
-                    dpg.set_value('top', line.strip())
-            else:
-                print("Failed to get top output. Retrying...")
-
     else:
         dpg.set_value("text_widget", f'Connect to VM: False')

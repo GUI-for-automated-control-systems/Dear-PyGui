@@ -1,4 +1,7 @@
+import time
+
 import dearpygui.dearpygui as dpg
+import threading
 
 from callbacks.switch_window.switch_window import (open_main_window,
                                                    open_console_window,
@@ -21,18 +24,33 @@ dpg.create_viewport(title='VMmanager', width=WIDTH, height=HEIGHT)
 dpg.setup_dearpygui()
 
 
+def monitoring():
+    time.sleep(10)
+    print('start')
+    global ssh
+    while True:
+        output = ssh.get_top_output()
+        top = ''
+        if output:
+            for line in output[7:28]:
+                top += line.strip() + '\n'
+        dpg.set_value('top', top)
+
+
+
 with dpg.font_registry():
     default_font = dpg.add_font("../font/JetBrainsMono-Medium.ttf", 24)
 
 
 with dpg.window(show=False) as monitoring_window:
     dpg.bind_font(default_font)
-    dpg.add_text(label='Top')
-    dpg.add_text(tag='top')
+    dpg.add_button(label='start', callback=monitoring)
     dpg.add_button(label="Back", callback=lambda: open_main_window(main_window,
                                                                    monitoring_window,
                                                                    transfer_window,
                                                                    console_window))
+    dpg.add_text(label='Top')
+    dpg.add_text(tag='top')
 
 with dpg.window(show=False) as transfer_window:
     dpg.bind_font(default_font)
@@ -45,7 +63,7 @@ with dpg.window(show=False) as transfer_window:
     dpg.add_spacer(height=10)
     dpg.add_button(label="Browse", callback=open_file_dialog)
     dpg.add_input_text(default_value='', hint='From', tag='from', readonly=True)
-    dpg.add_input_text(default_value='', hint='To', tag='to')
+    dpg.add_input_text(default_value='/root/file', hint='To', tag='to')
     dpg.add_spacer(height=30)
     dpg.add_button(label='Transfer', callback=lambda: transfer(ssh))
 
@@ -123,5 +141,9 @@ with dpg.window() as main_window:
 
 dpg.set_primary_window(main_window, True)
 dpg.show_viewport()
+
+thread = threading.Thread(target=monitoring)
+thread.start()
+
 dpg.start_dearpygui()
 dpg.destroy_context()
