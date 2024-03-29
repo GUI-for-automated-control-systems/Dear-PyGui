@@ -1,4 +1,5 @@
 import paramiko
+import dearpygui.dearpygui as dpg
 
 
 class SSHProcessing:
@@ -38,13 +39,13 @@ class SSHProcessing:
                 ftp_client = self.ssh.open_sftp()
                 ftp_client.putfo(local_file, remote_file_path)
                 ftp_client.close()
-            print("Файл успешно передан на сервер.")
+            dpg.set_value('transfer_message', 'The file is successfully transferred to the server.')
         except Exception as e:
-            print(f"Ошибка: {e}")
+            dpg.set_value('transfer_message', f'{e}')
 
     def get_top_output(self):
         try:
-            stdin, stdout, stderr = self.ssh.exec_command("top -b -n1")
+            stdin, stdout, stderr = self.ssh.exec_command("top -o %CPU -b -n1")
             top_output = stdout.readlines()
             return top_output
         except Exception as e:

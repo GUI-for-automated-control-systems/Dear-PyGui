@@ -18,6 +18,7 @@ def connect_ssh(ssh_client):
 
     connected = ssh_client.connect(host, port, username, password)
     if connected:
+        dpg.show_item('loading_on_main')
         dpg.set_value("text_widget", f'Connect to VM: True')   # <------------------------[
         dpg.show_item('monitoring')
         dpg.show_item('Exit')
@@ -28,6 +29,9 @@ def connect_ssh(ssh_client):
         dpg.set_value('cpu', cpu)
         dpg.set_value('uptime', uptime)
         dpg.show_item('info')
+        dpg.hide_item('loading_on_main')
+
+        return True
 
     else:
         dpg.set_value("text_widget", f'Connect to VM: False')
