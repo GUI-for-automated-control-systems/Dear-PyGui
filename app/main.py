@@ -56,7 +56,7 @@ def monitoring():
 
 
 with dpg.font_registry():
-    default_font = dpg.add_font("../font/JetBrainsMono-Medium.ttf", 24)
+    default_font = dpg.add_font("../font/JetBrainsMono-Medium.ttf", 20)
 
 
 with dpg.window(show=False, label='Monitoring', height=660, width=1360, pos=[WIDTH - 1140, HEIGHT - 740]) as monitoring_window:
@@ -67,7 +67,7 @@ with dpg.window(show=False, label='Monitoring', height=660, width=1360, pos=[WID
     with dpg.group(tag='progress', show=False):
         dpg.add_progress_bar(default_value=0.0, tag='cpu_bar', overlay='cpu')
         dpg.add_progress_bar(default_value=0.0, tag='mem_bar', overlay='mem')
-        dpg.add_text(default_value='    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND')
+        dpg.add_button(label='    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND')
     dpg.add_text(default_value='', tag='top')
 
 with dpg.window(show=False, label='Transfer files', width=670, height=300, pos=[WIDTH - 450, HEIGHT - 1060]) as transfer_window:
@@ -96,12 +96,12 @@ with dpg.file_dialog(directory_selector=False, show=False, callback=set_selected
 
 with dpg.window(show=False, label='Console', pos=[WIDTH - 1140, HEIGHT - 1060], width=670, height=300) as console_window:
     dpg.bind_font(default_font)
-    dpg.add_spacer(height=10)
     dpg.add_text('Command line mod')
     dpg.add_separator()
-    dpg.add_text('Description: Interactive command-line interface for system control and monitoring. '
-                 '\nWarning: Only command output is returned; commands opening files like nano or vi may disrupt '
-                 'scripts.'
+    dpg.add_text('Interactive command-line interface for system control.'
+                 '\nWarning: Only command output is returned \n'
+                 'Commands opening files like nano, vi or reboot may \n'
+                 'disrupt scripts.'
                  '\nExercise caution to prevent unintended consequences.')
     dpg.add_separator()
     dpg.add_spacer(height=10)
@@ -125,7 +125,7 @@ with dpg.window(show=True, label='Connect', width=500, height=980, pos=[WIDTH - 
     with dpg.group(horizontal=True):
         dpg.add_button(label="Connect", callback=lambda: connect_ssh(ssh))
         dpg.add_button(label="Exit", tag='Exit', callback=lambda: close(ssh), show=False)
-    dpg.add_spacer(height=30)
+    dpg.add_spacer(height=10)
 
     with dpg.group(horizontal=True, tag='monitoring', show=False):
         monitoring_button = dpg.add_button(label="Monitoring", callback=lambda: dpg.show_item(monitoring_window))
@@ -136,7 +136,7 @@ with dpg.window(show=True, label='Connect', width=500, height=980, pos=[WIDTH - 
 
     dpg.add_loading_indicator(tag='loading_on_main', show=False)
     with dpg.group(horizontal=False, tag='info', show=False):
-        dpg.add_spacer(height=30)
+        dpg.add_spacer(height=10)
         dpg.add_separator()
         dpg.add_text('Distributive')
         dpg.add_separator()
