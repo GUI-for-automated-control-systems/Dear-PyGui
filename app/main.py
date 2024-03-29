@@ -13,8 +13,8 @@ from callbacks.processing.main_window import close, connect_ssh
 from callbacks.processing.transfer_window import transfer, open_file_dialog, set_selected_file
 from callbacks.processing.console_window import print_command_result
 
-WIDTH = 1200
-HEIGHT = 900
+WIDTH = 1680
+HEIGHT = 1080
 
 ssh = SSHProcessing()
 
@@ -48,10 +48,10 @@ def monitoring():
 
 
 with dpg.font_registry():
-    default_font = dpg.add_font("../font/JetBrainsMono-Medium.ttf", 24)
+    default_font = dpg.add_font("../font/JetBrainsMono-Medium.ttf", 20)
 
 
-with dpg.window(show=False) as monitoring_window:
+with dpg.window(show=False, label='Monitoring') as monitoring_window:
     dpg.bind_font(default_font)
     dpg.add_button(label="Back", callback=lambda: open_main_window(main_window,
                                                                    monitoring_window,
@@ -66,7 +66,7 @@ with dpg.window(show=False) as monitoring_window:
         dpg.add_text(default_value='    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND')
     dpg.add_text(default_value='', tag='top')
 
-with dpg.window(show=False) as transfer_window:
+with dpg.window(show=False, label='Transfer files') as transfer_window:
     dpg.bind_font(default_font)
 
     dpg.add_button(label="Back", callback=lambda: open_main_window(main_window,
@@ -94,7 +94,7 @@ with dpg.file_dialog(directory_selector=False, show=False, callback=set_selected
     dpg.add_file_extension(".py", color=(0, 255, 0, 255))
 
 
-with dpg.window(show=False) as console_window:
+with dpg.window(show=False, label='Console') as console_window:
     dpg.bind_font(default_font)
     dpg.add_button(label="Back", callback=lambda: open_main_window(main_window, monitoring_window, transfer_window, console_window))
     dpg.add_spacer(height=10)
@@ -104,14 +104,16 @@ with dpg.window(show=False) as console_window:
                  '\nWarning: Only command output is returned; commands opening files like nano or vi may disrupt '
                  'scripts.'
                  '\nExercise caution to prevent unintended consequences.')
+    dpg.add_separator()
+    dpg.add_spacer(height=10)
     dpg.add_input_text(hint='command', tag='command')
     dpg.add_spacer(height=10)
     dpg.add_button(label='Execute', callback=lambda: print_command_result(ssh))
-    dpg.add_spacer(height=30)
+    dpg.add_spacer(height=10)
     dpg.add_text('', tag='command_res')
 
 
-with dpg.window(show=True) as main_window:
+with dpg.window(show=True, label='Connect', width=500, height=1080) as main_window:
     dpg.bind_font(default_font)
     text_widget = dpg.add_text(f'Connect to VM:', tag="text_widget")
     dpg.add_spacer(height=10)
@@ -163,7 +165,6 @@ with dpg.window(show=True) as main_window:
         dpg.add_separator()
         dpg.add_text(tag='uptime')
 
-dpg.set_primary_window(main_window, True)
 dpg.show_viewport()
 
 thread = threading.Thread(target=monitoring)
