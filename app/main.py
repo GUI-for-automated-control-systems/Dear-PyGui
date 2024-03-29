@@ -3,10 +3,6 @@ import time
 import dearpygui.dearpygui as dpg
 import threading
 
-from callbacks.switch_window.switch_window import (open_main_window,
-                                                   open_console_window,
-                                                   open_monitoring_window,
-                                                   open_transfer_window)
 from ssh_processing.SSHProcessing import SSHProcessing
 
 from callbacks.processing.main_window import close, connect_ssh
@@ -51,12 +47,8 @@ with dpg.font_registry():
     default_font = dpg.add_font("../font/JetBrainsMono-Medium.ttf", 20)
 
 
-with dpg.window(show=False, label='Monitoring') as monitoring_window:
+with dpg.window(show=False, label='Monitoring', height=660, width=1360, pos=[WIDTH - 1140, HEIGHT - 740]) as monitoring_window:
     dpg.bind_font(default_font)
-    dpg.add_button(label="Back", callback=lambda: open_main_window(main_window,
-                                                                   monitoring_window,
-                                                                   transfer_window,
-                                                                   console_window))
     dpg.add_text(default_value='Description: shows a real-time view of running processes in Linux and displays kernel-managed tasks.')
     dpg.add_separator()
     dpg.add_loading_indicator(tag='loading_on_monitor')
@@ -66,13 +58,9 @@ with dpg.window(show=False, label='Monitoring') as monitoring_window:
         dpg.add_text(default_value='    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND')
     dpg.add_text(default_value='', tag='top')
 
-with dpg.window(show=False, label='Transfer files') as transfer_window:
+with dpg.window(show=False, label='Transfer files', width=670, height=300, pos=[WIDTH - 450, HEIGHT - 1060]) as transfer_window:
     dpg.bind_font(default_font)
 
-    dpg.add_button(label="Back", callback=lambda: open_main_window(main_window,
-                                                                   monitoring_window,
-                                                                   transfer_window,
-                                                                   console_window))
     dpg.add_text('Description: Easily transfer files from your local machine to a remote server.')
     dpg.add_separator()
 
@@ -94,9 +82,8 @@ with dpg.file_dialog(directory_selector=False, show=False, callback=set_selected
     dpg.add_file_extension(".py", color=(0, 255, 0, 255))
 
 
-with dpg.window(show=False, label='Console') as console_window:
+with dpg.window(show=False, label='Console', pos=[WIDTH - 1140, HEIGHT - 1060], width=670, height=300) as console_window:
     dpg.bind_font(default_font)
-    dpg.add_button(label="Back", callback=lambda: open_main_window(main_window, monitoring_window, transfer_window, console_window))
     dpg.add_spacer(height=10)
     dpg.add_text('Command line mod')
     dpg.add_separator()
@@ -113,7 +100,7 @@ with dpg.window(show=False, label='Console') as console_window:
     dpg.add_text('', tag='command_res')
 
 
-with dpg.window(show=True, label='Connect', width=500, height=1080) as main_window:
+with dpg.window(show=True, label='Connect', width=500, height=980, pos=[WIDTH - 1660, HEIGHT - 1060], no_close=True) as main_window:
     dpg.bind_font(default_font)
     text_widget = dpg.add_text(f'Connect to VM:', tag="text_widget")
     dpg.add_spacer(height=10)
@@ -128,22 +115,12 @@ with dpg.window(show=True, label='Connect', width=500, height=1080) as main_wind
         dpg.add_button(label="Exit", tag='Exit', callback=lambda: close(ssh), show=False)
     dpg.add_spacer(height=30)
 
-
     with dpg.group(horizontal=True, tag='monitoring', show=False):
-        monitoring_button = dpg.add_button(label="Monitoring", callback=lambda: open_monitoring_window(main_window,
-                                                                                                       monitoring_window,
-                                                                                                       transfer_window,
-                                                                                                       console_window))
+        monitoring_button = dpg.add_button(label="Monitoring", callback=lambda: dpg.show_item(monitoring_window))
 
-        console_button = dpg.add_button(label="Console", callback=lambda: open_console_window(main_window,
-                                                                                              monitoring_window,
-                                                                                              transfer_window,
-                                                                                              console_window))
+        console_button = dpg.add_button(label="Console", callback=lambda: dpg.show_item(console_window))
 
-        transfer_button = dpg.add_button(label="Transfer file", callback=lambda: open_transfer_window(main_window,
-                                                                                                      monitoring_window,
-                                                                                                      transfer_window,
-                                                                                                      console_window))
+        transfer_button = dpg.add_button(label="Transfer file", callback=lambda: dpg.show_item(transfer_window))
 
     dpg.add_loading_indicator(tag='loading_on_main', show=False)
     with dpg.group(horizontal=False, tag='info', show=False):
