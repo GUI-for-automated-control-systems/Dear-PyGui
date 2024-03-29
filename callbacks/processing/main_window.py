@@ -22,16 +22,5 @@ def connect_ssh(ssh_client):
         dpg.set_value("text_widget", f'Connect to VM: True')   # <------------------------[
         dpg.show_item('monitoring')
         dpg.show_item('Exit')
-
-        dist, mem, cpu, uptime = ssh_client.get_vm_info()
-        dpg.set_value('distributive', dist)
-        dpg.set_value('memory', mem)
-        dpg.set_value('cpu', cpu)
-        dpg.set_value('uptime', uptime)
-        dpg.show_item('info')
-        dpg.hide_item('loading_on_main')
-
-        return True
-
     else:
         dpg.set_value("text_widget", f'Connect to VM: False')

@@ -20,11 +20,23 @@ dpg.create_viewport(title='VMmanager', width=WIDTH, height=HEIGHT)
 dpg.setup_dearpygui()
 
 
+def about_vm():
+    time.sleep(10)
+    global ssh
+    while True:
+        dist, mem, cpu, uptime = ssh.get_vm_info()
+        dpg.set_value('distributive', dist)
+        dpg.set_value('memory', mem)
+        dpg.set_value('cpu', cpu)
+        dpg.set_value('uptime', uptime)
+        dpg.show_item('info')
+        dpg.hide_item('loading_on_main')
+
+
 def monitoring():
     time.sleep(10)
     dpg.show_item('progress')
     dpg.hide_item('loading_on_monitor')
-
     global ssh
     while True:
         output = ssh.get_top_output()
@@ -44,12 +56,12 @@ def monitoring():
 
 
 with dpg.font_registry():
-    default_font = dpg.add_font("../font/JetBrainsMono-Medium.ttf", 20)
+    default_font = dpg.add_font("../font/JetBrainsMono-Medium.ttf", 24)
 
 
 with dpg.window(show=False, label='Monitoring', height=660, width=1360, pos=[WIDTH - 1140, HEIGHT - 740]) as monitoring_window:
     dpg.bind_font(default_font)
-    dpg.add_text(default_value='Description: shows a real-time view of running processes in Linux and displays kernel-managed tasks.')
+    dpg.add_text(default_value='Shows a real-time view of running processes.')
     dpg.add_separator()
     dpg.add_loading_indicator(tag='loading_on_monitor')
     with dpg.group(tag='progress', show=False):
@@ -61,7 +73,7 @@ with dpg.window(show=False, label='Monitoring', height=660, width=1360, pos=[WID
 with dpg.window(show=False, label='Transfer files', width=670, height=300, pos=[WIDTH - 450, HEIGHT - 1060]) as transfer_window:
     dpg.bind_font(default_font)
 
-    dpg.add_text('Description: Easily transfer files from your local machine to a remote server.')
+    dpg.add_text('Transfer files from local machine to a remote server.')
     dpg.add_separator()
 
     dpg.add_spacer(height=10)
@@ -146,6 +158,9 @@ dpg.show_viewport()
 
 thread = threading.Thread(target=monitoring)
 thread.start()
+
+thread_2 = threading.Thread(target=about_vm)
+thread_2.start()
 
 dpg.start_dearpygui()
 dpg.destroy_context()
