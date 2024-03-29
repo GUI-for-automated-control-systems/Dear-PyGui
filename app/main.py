@@ -29,12 +29,21 @@ def monitoring():
     global ssh
     while True:
         output = ssh.get_top_output()
+        cpu = 0.0
+        mem = 0.0
         top = ''
         if output:
-            for line in output[6:38]:
+            for line in output[7:]:
                 top += line
+                mem += float(line.split()[9])
+                cpu += float(line.split()[8])
+                dpg.set_value('cpu_bar', cpu / 100)
+                dpg.set_value('mem_bar', mem / 100)
         dpg.hide_item('loading_on_monitor')
         dpg.set_value('top', top)
+
+        mem = 0
+        cpu = 0
 
 
 with dpg.font_registry():
@@ -50,6 +59,9 @@ with dpg.window(show=False) as monitoring_window:
     dpg.add_text(default_value='Description: shows a real-time view of running processes in Linux and displays kernel-managed tasks.')
     dpg.add_separator()
     dpg.add_loading_indicator(tag='loading_on_monitor')
+    dpg.add_progress_bar(default_value=0.0, tag='cpu_bar', overlay='cpu')
+    dpg.add_progress_bar(default_value=0.0, tag='mem_bar', overlay='mem')
+    dpg.add_text(default_value='    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND')
     dpg.add_text(default_value='', tag='top')
 
 with dpg.window(show=False) as transfer_window:

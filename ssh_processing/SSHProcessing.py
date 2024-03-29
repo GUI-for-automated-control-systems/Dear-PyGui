@@ -39,13 +39,14 @@ class SSHProcessing:
                 ftp_client = self.ssh.open_sftp()
                 ftp_client.putfo(local_file, remote_file_path)
                 ftp_client.close()
-            dpg.set_value('transfer_message', 'The file is successfully transferred to the server.')
+            dpg.set_value('transfer_message', 'message: the file is successfully transferred to the server.')
         except Exception as e:
-            dpg.set_value('transfer_message', f'{e}')
+            dpg.set_value('transfer_message', f'message: {e}')
 
     def get_top_output(self):
         try:
-            stdin, stdout, stderr = self.ssh.exec_command("top -o %CPU -b -n1")
+            stdin, stdout, stderr = self.ssh.exec_command("top -o %MEM -o %CPU -b -n1")
+
             top_output = stdout.readlines()
             return top_output
         except Exception as e:
