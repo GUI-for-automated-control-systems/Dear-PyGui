@@ -16,7 +16,7 @@ ssh = SSHProcessing()
 
 
 dpg.create_context()
-dpg.create_viewport(title='VMmanager', width=WIDTH, height=HEIGHT)
+dpg.create_viewport(title='V|Monitoring', width=WIDTH, height=HEIGHT)
 dpg.setup_dearpygui()
 
 
